@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -129,7 +128,6 @@ iframe {
   background: #444;
 }
 </style>
-
 </head>
 
 <body>
@@ -177,6 +175,7 @@ placeholder="Example: Make me an awesome website to rick roll my friends compute
 </main>
 </div>
 
+
 <div id="prankPage">
 
 <h1>You got Rick rolled!</h1>
@@ -184,7 +183,7 @@ placeholder="Example: Make me an awesome website to rick roll my friends compute
 <iframe
 id="video"
 src=""
-allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+allow="autoplay; fullscreen; encrypted-media"
 allowfullscreen>
 </iframe>
 
@@ -195,6 +194,7 @@ Stop prank
 </button>
 
 </div>
+
 
 <script>
 
@@ -212,6 +212,9 @@ function buildWebsite() {
     "✓ Generating HTML...",
     "✓ Adding CSS magic...",
     "✓ Writing JavaScript...",
+    "✓ Asking gemini...",
+    "✓ Asking chatgpt...",
+    "✓ Asking grok...",
     "✓ Finalizing website..."
   ];
 
@@ -241,21 +244,22 @@ function buildWebsite() {
 }
 
 
-function startPrank() {
-
-  const video = document.getElementById("video");
-
-  // Load video immediately from the user's button click
-  video.src =
-    "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&playsinline=1";
+async function startPrank() {
 
   document.getElementById("mainPage").style.display = "none";
   document.getElementById("prankPage").style.display = "block";
 
-  // Request fullscreen
-  if (document.documentElement.requestFullscreen) {
-    document.documentElement.requestFullscreen().catch(() => {});
+  // Request fullscreen after user clicks the button
+  try {
+    await document.documentElement.requestFullscreen();
+  } catch (error) {
+    console.log("Fullscreen not available");
   }
+
+  const video = document.getElementById("video");
+
+  video.src =
+    "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&playsinline=1";
 
 }
 
