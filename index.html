@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Adumbi - AI Website Builder</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1020;
+      color: white;
+      min-height: 100vh;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 7%;
+      border-bottom: 1px solid #28304a;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #7c8cff;
+    }
+
+    .badge {
+      background: #18213d;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #aab4ff;
+    }
+
+    main {
+      max-width: 850px;
+      margin: auto;
+      padding: 70px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 72px);
+      margin-bottom: 15px;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, #8c7bff, #39d9ff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: #aeb7d0;
+      font-size: 18px;
+      margin-bottom: 40px;
+    }
+
+    .builder {
+      background: #131a2e;
+      border: 1px solid #293454;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, .3);
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      background: #0b1020;
+      border: 1px solid #354166;
+      border-radius: 12px;
+      padding: 16px;
+      color: white;
+      font-size: 16px;
+      resize: none;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 15px 28px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #756cff, #38cfff);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    #status {
+      margin-top: 30px;
+      text-align: left;
+      display: none;
+    }
+
+    .status-line {
+      padding: 10px;
+      color: #9effc3;
+      animation: appear .4s ease;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .reveal {
+      display: none;
+      margin-top: 30px;
+      padding: 30px;
+      border-radius: 20px;
+      background: #131a2e;
+    }
+
+    .reveal h2 {
+      font-size: 32px;
+    }
+
+    .exit {
+      background: #303956;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo">Ad<span>umbi</span></div>
+    <div class="badge">● AI Website Builder</div>
+  </nav>
+
+  <main>
+    <h1>
+      Build websites with
+      <span class="gradient">AI.</span>
+    </h1>
+
+    <p class="subtitle">
+      Describe your dream website and Adumbi will bring it to life.
+    </p>
+
+    <div class="builder">
+
+      <textarea
+        id="idea"
+        placeholder="Example: Make me an awesome game website..."
+      ></textarea>
+
+      <br>
+
+      <button onclick="buildWebsite()">
+        ✨ Generate Website
+      </button>
+
+      <div id="status"></div>
+
+      <div class="reveal" id="reveal">
+        <h2>🎉 Website Generated!</h2>
+        <p>Adumbi has finished building your website...</p>
+
+        <button onclick="surprise()">
+          Open Website 🚀
+        </button>
+
+        <button class="exit" onclick="closeReveal()">
+          Maybe later
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+
+    function buildWebsite() {
+
+      const status = document.getElementById("status");
+      const reveal = document.getElementById("reveal");
+
+      status.innerHTML = "";
+      status.style.display = "block";
+      reveal.style.display = "none";
+
+      const messages = [
+        "✓ Understanding your idea...",
+        "✓ Consulting extremely advanced AI...",
+        "✓ Generating HTML...",
+        "✓ Adding CSS magic...",
+        "✓ Writing JavaScript...",
+        "✓ Adding 1,247 unnecessary divs...",
+        "✓ Making it legendary...",
+        "✓ Finalizing website..."
+      ];
+
+      messages.forEach((message, index) => {
+
+        setTimeout(() => {
+
+          const line = document.createElement("div");
+
+          line.className = "status-line";
+          line.textContent = message;
+
+          status.appendChild(line);
+
+          if (index === messages.length - 1) {
+
+            setTimeout(() => {
+              reveal.style.display = "block";
+            }, 700);
+
+          }
+
+        }, index * 700);
+
+      });
+
+    }
+
+
+    function surprise() {
+
+      window.location.href =
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ&autoplay=1";
+
+    }
+
+
+    function closeReveal() {
+
+      document.getElementById("reveal").style.display = "none";
+
+    }
+
+  </script>
+
+</body>
+</html>
