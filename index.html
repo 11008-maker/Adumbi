@@ -117,12 +117,6 @@ button {
   padding: 30px;
 }
 
-#timer {
-  font-size: 45px;
-  font-weight: bold;
-  margin: 15px;
-}
-
 iframe {
   width: min(900px, 95vw);
   aspect-ratio: 16 / 9;
@@ -162,17 +156,17 @@ placeholder="Example: Make me an awesome website to rick roll my friends compute
 
 <br>
 
-<button onclick="buildWebsite()"> Generate Website</button>
+<button onclick="buildWebsite()">Generate Website</button>
 
 <div id="status"></div>
 
 <div class="reveal" id="reveal">
 
-<h2> Website Generated!</h2>
+<h2>Website Generated!</h2>
 
 <p>Adumbi has finished building your website...</p>
 
-<button onclick="startPrank()">Open Website </button>
+<button onclick="startPrank()">Open Website</button>
 
 </div>
 
@@ -186,14 +180,13 @@ placeholder="Example: Make me an awesome website to rick roll my friends compute
 
 <h1>You got Rick rolled!</h1>
 
-<div id="timer">3:00</div>
-
 <iframe
-  id="video"
-  src=""
-  allow="autoplay; fullscreen; encrypted-media"
-  allowfullscreen>
+id="video"
+src=""
+allow="autoplay; fullscreen; encrypted-media"
+allowfullscreen>
 </iframe>
+
 <br>
 
 <button class="stop" onclick="stopPrank()">
@@ -204,9 +197,6 @@ Stop prank
 
 
 <script>
-
-let timerInterval;
-let secondsLeft = 120;
 
 function buildWebsite() {
 
@@ -251,48 +241,39 @@ function buildWebsite() {
 }
 
 
-function startPrank() {
+async function startPrank() {
 
   document.getElementById("mainPage").style.display = "none";
-
   document.getElementById("prankPage").style.display = "block";
+
+  // Request fullscreen after user clicks the button
+  try {
+    await document.documentElement.requestFullscreen();
+  } catch (error) {
+    console.log("Fullscreen not available");
+  }
 
   const video = document.getElementById("video");
 
   video.src =
-    "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
-
-  secondsLeft = 120;
-
-  timerInterval = setInterval(() => {
-
-    secondsLeft--;
-
-    const minutes = Math.floor(secondsLeft / 60);
-    const seconds = secondsLeft % 60;
-
-    document.getElementById("timer").textContent =
-      minutes + ":" + String(seconds).padStart(2, "0");
-
-    if (secondsLeft <= 0) {
-      stopPrank();
-    }
-
-  }, 1000);
+    "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&playsinline=1";
 
 }
 
 
 function stopPrank() {
 
-  clearInterval(timerInterval);
-
   document.getElementById("video").src = "";
+
+  // Exit fullscreen
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
 
   document.getElementById("prankPage").innerHTML = `
 
-    <h1> You just got rick rolled!</h1>
-    
+    <h1>You just got rick rolled!</h1>
+
     <button onclick="location.reload()">
       Return to Adumbi
     </button>
