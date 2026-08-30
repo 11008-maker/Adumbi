@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -128,6 +129,7 @@ iframe {
   background: #444;
 }
 </style>
+
 </head>
 
 <body>
@@ -166,7 +168,9 @@ placeholder="Example: Make me an awesome website to rick roll my friends compute
 
 <p>Adumbi has finished building your website...</p>
 
-<button onclick="startPrank()">Open Website</button>
+<button id="openButton" onclick="startPrank()">
+Open Website
+</button>
 
 </div>
 
@@ -175,7 +179,6 @@ placeholder="Example: Make me an awesome website to rick roll my friends compute
 </main>
 </div>
 
-
 <div id="prankPage">
 
 <h1>You got Rick rolled!</h1>
@@ -183,7 +186,7 @@ placeholder="Example: Make me an awesome website to rick roll my friends compute
 <iframe
 id="video"
 src=""
-allow="autoplay; fullscreen; encrypted-media"
+allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
 allowfullscreen>
 </iframe>
 
@@ -195,8 +198,10 @@ Stop prank
 
 </div>
 
-
 <script>
+
+let tapCount = 0;
+
 
 function buildWebsite() {
 
@@ -244,22 +249,37 @@ function buildWebsite() {
 }
 
 
-async function startPrank() {
+function startPrank() {
 
-  document.getElementById("mainPage").style.display = "none";
-  document.getElementById("prankPage").style.display = "block";
+  tapCount++;
 
-  // Request fullscreen after user clicks the button
-  try {
-    await document.documentElement.requestFullscreen();
-  } catch (error) {
-    console.log("Fullscreen not available");
+  const button = document.getElementById("openButton");
+
+  // First tap: pretend the button is jammed
+  if (tapCount === 1) {
+
+    button.textContent = "Hmm... try again";
+
+    setTimeout(() => {
+      button.textContent = "Open Website";
+    }, 1000);
+
+    return;
   }
 
+  // Second tap: open the website
   const video = document.getElementById("video");
 
   video.src =
     "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&playsinline=1";
+
+  document.getElementById("mainPage").style.display = "none";
+  document.getElementById("prankPage").style.display = "block";
+
+  // Request fullscreen
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
 
 }
 
@@ -268,7 +288,6 @@ function stopPrank() {
 
   document.getElementById("video").src = "";
 
-  // Exit fullscreen
   if (document.fullscreenElement) {
     document.exitFullscreen();
   }
