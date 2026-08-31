@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adumbi</title>
+<title>Adumbi - AI rick rolling Website</title>
 <style>
 * { box-sizing: border-box; }
 body {
@@ -113,12 +113,12 @@ iframe {
 <div id="mainPage">
 <nav>
   <div class="logo">Ad<span>umbi</span></div>
-  <div class="badge">● AI rick roll Website Builder</div>
+  <div class="badge">● AI rick rolling Website Builder</div>
 </nav>
 <main>
 <h1>Build websites with <span class="gradient">AI.</span></h1>
 <p class="subtitle">
-Describe your dream rick rolling website and Adumbi will bring it to life.
+Describe your dream website and Adumbi will bring it to life.
 </p>
 <div class="builder">
 <textarea
@@ -133,9 +133,9 @@ Generate Website
 <div class="reveal" id="reveal">
 <h2>Website Generated!</h2>
 <p>Adumbi has finished building your website...</p>
-<button onclick="startPrank()">
+
 Open Website
-</button>
+
 </div>
 </div>
 </main>
@@ -192,12 +192,16 @@ function startPrank() {
   document.getElementById("mainPage").style.display = "none";
   document.getElementById("prankPage").style.display = "block";
   // Request fullscreen
+  // Request autoplay
   if (document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
+    (document.documentElement.requestautoplay) {
+    document.documentElement.requestFullautoplay().catch(() => {});
   }
 }
 function stopPrank() {
   document.getElementById("video").src = "";
+  // Exit fullscreen
   if (document.fullscreenElement) {
     document.exitFullscreen();
   }
