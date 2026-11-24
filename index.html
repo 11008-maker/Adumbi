@@ -163,7 +163,7 @@ iframe {
 </h1>
 
 <p class="subtitle">
-  Describe your website idea. Connect an AI endpoint or use the offline starter builder.
+  Describe your website idea. In Suss Mode, a real coding model generates HTML on your device.
 </p>
 
 <div class="builder">
@@ -179,14 +179,14 @@ iframe {
   Generate Website
 </button>
 
-<details id="aiConfig" style="margin-top:18px;text-align:left"><summary>AI connection settings</summary><p>Use a trusted HTTPS website-generation backend that returns JSON with an html field. Keep API keys on your server, never in this page. Prompts are sent to your chosen endpoint.</p><input id="aiEndpoint" type="url" placeholder="https://your-server.example/generate" style="width:100%;padding:12px;border-radius:8px"><p><label><input id="aiEnabled" type="checkbox"> Use connected AI</label></p></details><div id="status" role="status" aria-live="polite"></div>
+<details id="aiConfig" style="margin-top:18px;text-align:left"><summary>Optional external AI connection</summary><p>Use a trusted HTTPS website-generation backend that returns JSON with an html field. Keep API keys on your server, never in this page. Prompts are sent to your chosen endpoint.</p><input id="aiEndpoint" type="url" placeholder="https://your-server.example/generate" style="width:100%;padding:12px;border-radius:8px"><p><label><input id="aiEnabled" type="checkbox"> Use connected AI</label></p></details><div id="status" role="status" aria-live="polite"></div>
 <div id="susPanel" hidden style="margin-top:20px;text-align:left"><h2>Rickroll Maker 🕺</h2><p>Create a Rickroll parody page with a clearly labeled video button.</p><label>Website title<br><input id="susTitle" value="Surprise!" maxlength="100" style="width:100%;padding:12px;border-radius:8px"></label><br><button id="susDownload" type="button">Download HTML</button> <button id="susExit" type="button">Enter AI Mode</button></div>
 
 <div class="reveal" id="reveal">
 
 <h2>Website Generated!</h2>
 
-<p>Your website is ready.</p><iframe id="preview" title="Website preview" sandbox style="width:100%;background:white"></iframe><textarea id="generatedCode" readonly aria-label="Generated HTML"></textarea>
+<p>Your website is ready.</p><iframe id="preview" title="Website preview" sandbox="allow-scripts" style="width:100%;background:white"></iframe><textarea id="generatedCode" readonly aria-label="Generated HTML"></textarea>
 
 <button id="openButton" type="button">
   Download Website
@@ -231,7 +231,7 @@ function setSus(on) {
   document.getElementById("generateButton").hidden=on;
   document.getElementById("status").style.display="none";
   document.getElementById("reveal").style.display="none";
-  document.querySelector(".badge").textContent=on?"● Rickroll Maker":"● Website Builder · AI option";
+  document.querySelector(".badge").textContent=on?"● Rickroll Maker":"● Suss Mode · Local AI";
   if(on) idea.value="";
 }
 idea.addEventListener("input",()=>{if(idea.value.trim().toLowerCase()==="suss mode/"){setSus(false);idea.value="";}else if(idea.value.trim().toLowerCase()==="ex/suss mode/"){setSus(true);idea.value="";}});
@@ -243,6 +243,32 @@ return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewpor
 }
 function downloadPage(html){const url=URL.createObjectURL(new Blob([html],{type:"text/html"}));const a=document.createElement("a");a.href=url;a.download="index.html";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 document.getElementById("susDownload").addEventListener("click",()=>downloadPage(makePage(document.getElementById("susTitle").value||"Surprise!",true)));
+let localModelPromise;
+async function localAI(prompt,status){
+  if(!localModelPromise){
+    localModelPromise=(async()=>{
+      status.textContent="Loading AI library and model for the first time…";
+      const {pipeline,env}=await import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2");
+      env.allowLocalModels=false;
+      env.backends.onnx.wasm.numThreads=1;
+      return await pipeline("text-generation","onnx-community/Qwen2.5-Coder-0.5B-Instruct",{
+        device:"wasm",dtype:"q4",progress_callback:p=>{
+          if(p.status==="progress"&&Number.isFinite(p.progress))status.textContent="Downloading model: "+Math.round(p.progress)+"% ("+p.file+")";
+        }
+      });
+    })().catch(e=>{localModelPromise=null;throw e;});
+  }
+  const model=await localModelPromise;
+  status.textContent="AI is writing your website…";
+  const output=await model([{role:"system",content:"You are a coding assistant. Create a safe, complete standalone HTML website with inline CSS and JavaScript. Do not generate phishing, unsafe instructions, or malicious code. Return only HTML."},{role:"user",content:prompt}],{max_new_tokens:1500,do_sample:false,return_full_text:false});
+  const g=output[0].generated_text;
+  let html=typeof g==="string"?g:Array.isArray(g)?g[g.length-1].content:"";
+  html=html.trim().replace(/^\x60\x60\x60(?:html)?\s*/i,"").replace(/\x60\x60\x60\s*$/,"");
+  const begin=html.search(/<!doctype html|<html[\s>]/i);
+  if(begin>=0)html=html.slice(begin);
+  if(!/<(?:html|body|div|h1)[\s>]/i.test(html))throw new Error("AI did not return usable HTML. Try a simpler description.");
+  return html;
+}
 async function buildWebsite() {
   if(susMode)return;
   const prompt=idea.value.trim();
@@ -264,11 +290,10 @@ async function buildWebsite() {
         starter=data.html;
       }finally{clearTimeout(timer);}
     }else{
-      status.textContent="Offline starter generated (not AI).";
-      starter=makePage(prompt.slice(0,100),false);
+      starter=await localAI(prompt,status);
     }
     if(!susMode){document.getElementById("preview").srcdoc=starter;document.getElementById("generatedCode").value=starter;reveal.style.display="block";}
-    if(document.getElementById("aiEnabled").checked)status.textContent="AI generation complete.";
+    status.textContent="AI generation complete. Review the code before publishing.";
   }catch(e){status.textContent="Generation failed: "+e.message;}
   finally{btn.disabled=false;}
 }
