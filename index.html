@@ -152,7 +152,7 @@ iframe {
 
 <nav>
   <div class="logo">Ad<span>umbi</span></div>
-  <div class="badge">● Website Builder · AI option</div>
+  <div class="badge">● Suss Mode · AI Builder</div>
 </nav>
 
 <main>
@@ -180,7 +180,7 @@ iframe {
 </button>
 
 <details id="aiConfig" style="margin-top:18px;text-align:left"><summary>AI connection settings</summary><p>Use a trusted HTTPS website-generation backend that returns JSON with an html field. Keep API keys on your server, never in this page. Prompts are sent to your chosen endpoint.</p><input id="aiEndpoint" type="url" placeholder="https://your-server.example/generate" style="width:100%;padding:12px;border-radius:8px"><p><label><input id="aiEnabled" type="checkbox"> Use connected AI</label></p></details><div id="status" role="status" aria-live="polite"></div>
-<div id="susPanel" hidden style="margin-top:20px;text-align:left"><h2>Sus Mode 🕺</h2><p>Create a Rickroll parody page with a clearly labeled video button.</p><label>Website title<br><input id="susTitle" value="Surprise!" maxlength="100" style="width:100%;padding:12px;border-radius:8px"></label><br><button id="susDownload" type="button">Download HTML</button> <button id="susExit" type="button">Exit Sus Mode</button></div>
+<div id="susPanel" hidden style="margin-top:20px;text-align:left"><h2>Rickroll Maker 🕺</h2><p>Create a Rickroll parody page with a clearly labeled video button.</p><label>Website title<br><input id="susTitle" value="Surprise!" maxlength="100" style="width:100%;padding:12px;border-radius:8px"></label><br><button id="susDownload" type="button">Download HTML</button> <button id="susExit" type="button">Enter AI Mode</button></div>
 
 <div class="reveal" id="reveal">
 
@@ -224,18 +224,19 @@ iframe {
 
 const idea = document.getElementById("idea");
 const susPanel = document.getElementById("susPanel");
-let susMode = false;
+let susMode = true;
 let starter = "";
 function setSus(on) {
   susMode=on; susPanel.hidden=!on; document.getElementById("aiConfig").hidden=on;
   document.getElementById("generateButton").hidden=on;
   document.getElementById("status").style.display="none";
   document.getElementById("reveal").style.display="none";
-  document.querySelector(".badge").textContent=on?"● Sus Mode · Rickroll Maker":"● Website Builder · AI option";
+  document.querySelector(".badge").textContent=on?"● Rickroll Maker":"● Website Builder · AI option";
   if(on) idea.value="";
 }
-idea.addEventListener("input",()=>{if(idea.value.trim().toLowerCase()==="sus mode/")setSus(true);else if(idea.value.trim().toLowerCase()==="ex/sus mode/"){setSus(false);idea.value="";}});
+idea.addEventListener("input",()=>{if(idea.value.trim().toLowerCase()==="suss mode/"){setSus(false);idea.value="";}else if(idea.value.trim().toLowerCase()==="ex/suss mode/"){setSus(true);idea.value="";}});
 document.getElementById("susExit").addEventListener("click",()=>setSus(false));
+setSus(true);
 function escapeHtml(v){return v.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function makePage(title,prank){
 return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHtml(title)+'</title><style>body{background:#101827;color:white;font:20px system-ui;text-align:center;padding:50px}a{display:inline-block;background:#756cff;color:white;padding:15px;border-radius:12px;text-decoration:none}</style><h1>'+escapeHtml(title)+'</h1>'+(prank?'<p>Unofficial Rickroll parody</p><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Play Rickroll video</a>':'<p>Welcome to your new website.</p>')+'</html>';
