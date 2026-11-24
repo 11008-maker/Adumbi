@@ -234,7 +234,7 @@ function setSus(on) {
   document.querySelector(".badge").textContent=on?"● Sus Mode · Rickroll Maker":"● Website Builder · AI option";
   if(on) idea.value="";
 }
-idea.addEventListener("input",()=>{if(idea.value.trim().toLowerCase()==="sus mode/")setSus(true);else if(idea.value.trim().toLowerCase()==="ex/sus mode"){setSus(false);idea.value="";}});
+idea.addEventListener("input",()=>{if(idea.value.trim().toLowerCase()==="sus mode/")setSus(true);else if(idea.value.trim().toLowerCase()==="ex/sus mode/"){setSus(false);idea.value="";}});
 document.getElementById("susExit").addEventListener("click",()=>setSus(false));
 function escapeHtml(v){return v.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function makePage(title,prank){
