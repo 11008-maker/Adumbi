@@ -152,7 +152,7 @@ iframe {
 
 <nav>
   <div class="logo">Ad<span>umbi</span></div>
-  <div class="badge">● AI rick roll Website Builder</div>
+  <div class="badge">● Website Builder · Demo</div>
 </nav>
 
 <main>
@@ -163,14 +163,14 @@ iframe {
 </h1>
 
 <p class="subtitle">
-  Describe your dream rick rolling website and Adumbi will bring it to life.
+  Describe your website idea to create a simple starter page.
 </p>
 
 <div class="builder">
 
 <textarea
   id="idea"
-  placeholder="Example: Make me an awesome website to rick roll my friends computer."
+  placeholder="Example: Make me an awesome website."
 ></textarea>
 
 <br>
@@ -180,15 +180,16 @@ iframe {
 </button>
 
 <div id="status"></div>
+<div id="susPanel" hidden style="margin-top:20px;text-align:left"><h2>Sus Mode 🕺</h2><p>Create a Rickroll parody page with a clearly labeled video button.</p><label>Website title<br><input id="susTitle" value="Surprise!" maxlength="100" style="width:100%;padding:12px;border-radius:8px"></label><br><button id="susDownload" type="button">Download HTML</button> <button id="susExit" type="button">Exit Sus Mode</button></div>
 
 <div class="reveal" id="reveal">
 
 <h2>Website Generated!</h2>
 
-<p>Adumbi has finished building your website...</p>
+<p>Your starter website is ready.</p>
 
 <button id="openButton" type="button">
-  Open Website
+  Download Website
 </button>
 
 </div>
@@ -221,7 +222,33 @@ iframe {
 
 <script>
 
+const idea = document.getElementById("idea");
+const susPanel = document.getElementById("susPanel");
+let susMode = false;
+let starter = "";
+function setSus(on) {
+  susMode=on; susPanel.hidden=!on;
+  document.getElementById("generateButton").hidden=on;
+  document.getElementById("status").style.display="none";
+  document.getElementById("reveal").style.display="none";
+  document.querySelector(".badge").textContent=on?"● Sus Mode · Rickroll Maker":"● Website Builder · Demo";
+  if(on) idea.value="";
+}
+idea.addEventListener("input",()=>{if(idea.value.trim().toLowerCase()==="sus mode/")setSus(true);});
+document.getElementById("susExit").addEventListener("click",()=>setSus(false));
+function escapeHtml(v){return v.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function makePage(title,prank){
+return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHtml(title)+'</title><style>body{background:#101827;color:white;font:20px system-ui;text-align:center;padding:50px}a{display:inline-block;background:#756cff;color:white;padding:15px;border-radius:12px;text-decoration:none}</style><h1>'+escapeHtml(title)+'</h1>'+(prank?'<p>Unofficial Rickroll parody</p><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Play Rickroll video</a>':'<p>Welcome to your new website.</p>')+'</html>';
+}
+function downloadPage(html){const url=URL.createObjectURL(new Blob([html],{type:"text/html"}));const a=document.createElement("a");a.href=url;a.download="index.html";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+document.getElementById("susDownload").addEventListener("click",()=>downloadPage(makePage(document.getElementById("susTitle").value||"Surprise!",true)));
 function buildWebsite() {
+  if(susMode)return;
+  starter=makePage(idea.value.trim().slice(0,100)||"My Website",false);
+  document.getElementById("reveal").style.display="block";
+  document.getElementById("status").style.display="none";
+}
+function legacyBuildWebsite() {
 
   const status = document.getElementById("status");
   const reveal = document.getElementById("reveal");
@@ -305,7 +332,7 @@ document.getElementById("generateButton")
   .addEventListener("click", buildWebsite);
 
 document.getElementById("openButton")
-  .addEventListener("click", startPrank);
+  .addEventListener("click", () => downloadPage(starter));
 
 document.getElementById("stopButton")
   .addEventListener("click", stopPrank);
