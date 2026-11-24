@@ -231,7 +231,7 @@ function setMode(next){
   document.getElementById("aiConfig").hidden=mode!=="ai";
   document.getElementById("generateButton").hidden=mode==="sus";
   document.getElementById("generateButton").textContent="Generate Website";
-  document.getElementById("openButton").textContent=mode==="original"?"Open Rickroll":"Download Website";
+  document.getElementById("openButton").textContent=mode==="original"?"Open Surprise":"Download Website";
   document.getElementById("preview").hidden=mode!=="ai";
   document.getElementById("generatedCode").hidden=mode!=="ai";
   document.getElementById("status").style.display="none";
@@ -299,7 +299,7 @@ let originalRun=0;
 function originalBuild(){
  const run=++originalRun, status=document.getElementById("status"), reveal=document.getElementById("reveal");
  status.style.display="block";reveal.style.display="none";status.textContent="";
- const stages=["Preparing parody page…","Adding styles…","Preparing video…","Done!"];
+ const stages=["Loading…","Almost done…","Done!"];
  stages.forEach((stage,i)=>setTimeout(()=>{
  if(mode!=="original"||run!==originalRun)return;
  status.textContent=stage;
