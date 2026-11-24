@@ -182,6 +182,7 @@ iframe {
 <p id="aiConfig" hidden style="font-size:14px;color:#aeb7d0">Built-in Qwen coding AI · Runs locally · No API key required</p><div id="status" role="status" aria-live="polite"></div>
 <div id="susPanel" hidden style="margin-top:20px;text-align:left"><h2>Rickroll Maker 🕺</h2><p>Create a Rickroll parody page with a clearly labeled video button.</p><label>Website title<br><input id="susTitle" value="Surprise!" maxlength="100" style="width:100%;padding:12px;border-radius:8px"></label><br><button id="susDownload" type="button">Create Website</button> <button id="susExit" type="button">Exit Sus Mode</button><section id="susResult" hidden style="margin-top:20px"><h3>Website preview</h3><iframe id="susPreview" title="Parody website preview" sandbox="allow-popups allow-popups-to-escape-sandbox" style="width:100%;background:white"></iframe><button id="susOpen" type="button">Open Website</button></section></div>
 
+<section id="shortPanel" hidden style="margin-top:20px;text-align:left"><h2>Short Mode · URL shortener</h2><p>Shorten ordinary public website links using is.gd. The destination URL is sent to that service. Do not enter private links or links containing passwords or tokens.</p><label for="shortUrl">Website URL</label><input id="shortUrl" type="url" placeholder="https://example.com/long-page" style="display:block;width:100%;padding:14px;border-radius:10px;margin-top:8px"><button id="shortCreate" type="button">Shorten Link</button> <button id="shortExit" type="button">Exit Short Mode</button><p id="shortStatus" role="status"></p><div id="shortResult" hidden><label for="shortOutput">Shortened URL</label><input id="shortOutput" readonly style="display:block;width:100%;padding:14px;border-radius:10px"><button id="shortCopy" type="button">Copy Link</button><p id="shortDestination" style="overflow-wrap:anywhere"></p></div></section>
 <div class="reveal" id="reveal">
 
 <h2>Website Generated!</h2>
@@ -227,28 +228,54 @@ const susPanel = document.getElementById("susPanel");
 let mode="original";
 let starter="";
 function setMode(next){
-  mode=next; susPanel.hidden=mode!=="sus"; document.getElementById("susResult").hidden=true;
+  mode=next; document.getElementById("shortPanel").hidden=mode!=="short"; susPanel.hidden=mode!=="sus"; document.getElementById("susResult").hidden=true;
   document.getElementById("aiConfig").hidden=mode!=="ai";
-  document.getElementById("generateButton").hidden=mode==="sus";
+  document.getElementById("generateButton").hidden=mode==="sus"||mode==="short";
   document.getElementById("generateButton").textContent="Generate Website";
   document.getElementById("openButton").textContent=mode==="original"?"Open Surprise":"Download Website";
   document.getElementById("preview").hidden=mode!=="ai";
   document.getElementById("generatedCode").hidden=mode!=="ai";
   document.getElementById("status").style.display="none";
   document.getElementById("reveal").style.display="none";
-  document.querySelector(".badge").textContent=mode==="ai"?"● Suss Mode · Local AI":mode==="sus"?"● Sus Mode · Rickroll Maker":"● Adumbi · Rickroll parody";
-  document.querySelector(".subtitle").textContent=mode==="ai"?"Describe your website idea and generate it with AI.":mode==="sus"?"Create a Rickroll parody website.":"Welcome to the original Adumbi Rickroll experience.";
+  document.querySelector(".badge").textContent=mode==="ai"?"● Suss Mode · Local AI":mode==="short"?"● Short Mode · URL Shortener":mode==="sus"?"● Sus Mode · Rickroll Maker":"● Adumbi · Rickroll parody";
+  document.querySelector(".subtitle").textContent=mode==="ai"?"Describe your website idea and generate it with AI.":mode==="short"?"Create a shorter link to a public website.":mode==="sus"?"Create a Rickroll parody website.":"Welcome to the original Adumbi Rickroll experience.";
   idea.value="";
 }
 idea.addEventListener("input",()=>{
  const cmd=idea.value.trim().toLowerCase();
  if(cmd==="sus mode/")setMode("sus");
  else if(cmd==="suss mode/")setMode("ai");
+ else if(cmd==="short mode/")setMode("short");
+ else if(cmd==="ex/short mode/"&&mode==="short")setMode("original");
  else if(cmd==="ex/sus mode/"&&mode==="sus")setMode("original");
  else if(cmd==="ex/suss mode/"&&mode==="ai")setMode("original");
 });
 document.getElementById("susExit").addEventListener("click",()=>setMode("original"));
 setMode("original");
+const shortStatus=document.getElementById("shortStatus");
+document.getElementById("shortExit").addEventListener("click",()=>setMode("original"));
+document.getElementById("shortCreate").addEventListener("click",async()=>{
+ const btn=document.getElementById("shortCreate"), result=document.getElementById("shortResult");
+ result.hidden=true;
+ let url;
+ try{url=new URL(document.getElementById("shortUrl").value.trim());if(!["https:","http:"].includes(url.protocol)||url.username||url.password)throw Error();}catch{shortStatus.textContent="Enter a valid public http or https URL.";return;}
+ btn.disabled=true;shortStatus.textContent="Creating short link…";
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+ try{
+ const endpoint="https://is.gd/create.php?format=json&url="+encodeURIComponent(url.href);
+ const res=await fetch(endpoint,{signal:controller.signal});
+ if(!res.ok)throw Error("Service unavailable");
+ const data=await res.json();
+ if(!data.shorturl)throw Error(data.errormessage||"No short link returned");
+ const short=new URL(data.shorturl);
+ if(short.protocol!=="https:"||short.hostname!=="is.gd")throw Error("Unexpected short-link response");
+ document.getElementById("shortOutput").value=short.href;
+ document.getElementById("shortDestination").textContent="Destination: "+url.href;
+ result.hidden=false;shortStatus.textContent="Short link created.";
+ }catch(e){shortStatus.textContent="Automatic shortening unavailable. You can use is.gd directly.";const a=document.createElement("a");a.href="https://is.gd/";a.target="_blank";a.rel="noopener noreferrer";a.textContent=" Open is.gd";a.style.color="#aab4ff";shortStatus.appendChild(a);}
+ finally{clearTimeout(timer);btn.disabled=false;}
+});
+document.getElementById("shortCopy").addEventListener("click",async()=>{const input=document.getElementById("shortOutput");try{await navigator.clipboard.writeText(input.value);shortStatus.textContent="Copied!";}catch{input.select();shortStatus.textContent="Select and copy the link."; }});
 function escapeHtml(v){return v.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function makePage(title,prank){
 return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHtml(title)+'</title><style>body{background:#101827;color:white;font:20px system-ui;text-align:center;padding:50px}a{display:inline-block;background:#756cff;color:white;padding:15px;border-radius:12px;text-decoration:none}</style><h1>'+escapeHtml(title)+'</h1>'+(prank?'<p>Unofficial Rickroll parody</p><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Play Rickroll video</a>':'<p>Welcome to your new website.</p>')+'</html>';
