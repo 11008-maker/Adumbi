@@ -230,7 +230,10 @@ function setMode(next){
   mode=next; susPanel.hidden=mode!=="sus";
   document.getElementById("aiConfig").hidden=mode!=="ai";
   document.getElementById("generateButton").hidden=mode==="sus";
-  document.getElementById("generateButton").textContent=mode==="original"?"Play Rickroll":"Generate Website";
+  document.getElementById("generateButton").textContent="Generate Website";
+  document.getElementById("openButton").textContent=mode==="original"?"Open Rickroll":"Download Website";
+  document.getElementById("preview").hidden=mode!=="ai";
+  document.getElementById("generatedCode").hidden=mode!=="ai";
   document.getElementById("status").style.display="none";
   document.getElementById("reveal").style.display="none";
   document.querySelector(".badge").textContent=mode==="ai"?"● Suss Mode · Local AI":mode==="sus"?"● Sus Mode · Rickroll Maker":"● Adumbi · Rickroll parody";
@@ -279,7 +282,7 @@ async function localAI(prompt,status){
   return html;
 }
 async function buildWebsite() {
-  if(mode==="original"){startPrank();return;}
+  if(mode==="original"){originalBuild();return;}
   if(mode!=="ai")return;
   const prompt=idea.value.trim();
   if(!prompt){idea.focus();return;}
@@ -306,6 +309,17 @@ async function buildWebsite() {
     status.textContent="AI generation complete. Review the code before publishing.";
   }catch(e){status.textContent="Generation failed: "+e.message;}
   finally{btn.disabled=false;}
+}
+let originalRun=0;
+function originalBuild(){
+ const run=++originalRun, status=document.getElementById("status"), reveal=document.getElementById("reveal");
+ status.style.display="block";reveal.style.display="none";status.textContent="";
+ const stages=["Preparing parody page…","Adding styles…","Preparing video…","Done!"];
+ stages.forEach((stage,i)=>setTimeout(()=>{
+ if(mode!=="original"||run!==originalRun)return;
+ status.textContent=stage;
+ if(i===stages.length-1)reveal.style.display="block";
+ },(i+1)*650));
 }
 function legacyBuildWebsite() {
 
@@ -389,7 +403,7 @@ document.getElementById("generateButton")
   .addEventListener("click", buildWebsite);
 
 document.getElementById("openButton")
-  .addEventListener("click", () => downloadPage(starter));
+  .addEventListener("click", () => {if(mode==="original")startPrank();else if(mode==="ai")downloadPage(starter);});
 
 document.getElementById("stopButton")
   .addEventListener("click", stopPrank);
