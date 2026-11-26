@@ -205,7 +205,7 @@ iframe {
 
 <h1>You got Rick rolled!</h1>
 
-<video id="video" controls playsinline preload="metadata" style="width:min(900px,95vw);max-height:70vh;border-radius:15px;background:black"></video><p id="videoStatus" role="status"></p><p><a id="videoFallback" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" style="color:#aab4ff">Watch on YouTube</a></p>
+<audio id="video" controls preload="metadata" style="width:min(500px,90vw)" src="./rick-astley-never-gonna-give-you-up-official-music-video.mp3"></audio><p id="videoStatus" role="status"></p>
 
 <br>
 
@@ -273,12 +273,12 @@ document.getElementById("shortCreate").addEventListener("click",async()=>{
 document.getElementById("shortCopy").addEventListener("click",async()=>{const input=document.getElementById("shortOutput");try{await navigator.clipboard.writeText(input.value);shortStatus.textContent="Copied!";}catch{input.select();shortStatus.textContent="Select and copy the link."; }});
 function escapeHtml(v){return v.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function makePage(title,prank){
-return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHtml(title)+'</title><style>body{background:#101827;color:white;font:20px system-ui;text-align:center;padding:50px}a{display:inline-block;background:#756cff;color:white;padding:15px;border-radius:12px;text-decoration:none}</style><h1>'+escapeHtml(title)+'</h1>'+(prank?'<p>Unofficial Rickroll parody</p><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Play Rickroll video</a>':'<p>Welcome to your new website.</p>')+'</html>';
+return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHtml(title)+'</title><style>body{background:#101827;color:white;font:20px system-ui;text-align:center;padding:50px}a{display:inline-block;background:#756cff;color:white;padding:15px;border-radius:12px;text-decoration:none}</style><h1>'+escapeHtml(title)+'</h1>'+(prank?'<p>Unofficial Rickroll parody</p><audio controls preload="metadata" src="https://11008-maker.github.io/Adumbi/rick-astley-never-gonna-give-you-up-official-music-video.mp3"></audio>':'<p>Welcome to your new website.</p>')+'</html>';
 }
 function downloadPage(html){const url=URL.createObjectURL(new Blob([html],{type:"text/html"}));const a=document.createElement("a");a.href=url;a.download="index.html";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 let susHtml="";
 document.getElementById("susDownload").addEventListener("click",()=>{
- susHtml=makePage(document.getElementById("susTitle").value||"Surprise!",true).replace('href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"','target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"');
+ susHtml=makePage(document.getElementById("susTitle").value||"Surprise!",true);
  document.getElementById("susPreview").srcdoc=susHtml;
  document.getElementById("susResult").hidden=false;
 });
@@ -389,13 +389,14 @@ function startPrank(){
  status.textContent="";
  video.muted=false;
  video.defaultMuted=false;
- video.src="./media.mp4";
- video.play().catch(()=>{status.textContent="Tap Play to start. If the MP4 is unavailable, use the YouTube link.";});
+ if(!video.getAttribute("src"))video.src="./rick-astley-never-gonna-give-you-up-official-music-video.mp3";
+ video.currentTime=0;
+ video.play().catch(()=>{status.textContent="Tap Play to start the audio.";});
 }
-document.getElementById("video").addEventListener("error",()=>{document.getElementById("videoStatus").textContent="The MP4 file is unavailable. Use the YouTube link or add media.mp4 to the repository.";});
+document.getElementById("video").addEventListener("error",()=>{document.getElementById("videoStatus").textContent="The audio file could not be loaded.";});
 function stopPrank(){
  const video=document.getElementById("video");
- video.pause();video.removeAttribute("src");video.load();
+ video.pause();video.currentTime=0;
  document.getElementById("prankPage").style.display="none";
  document.getElementById("mainPage").style.display="block";
 }
