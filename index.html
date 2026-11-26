@@ -205,12 +205,7 @@ iframe {
 
 <h1>You got Rick rolled!</h1>
 
-<iframe
-  id="video"
-  src=""
-  allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-  allowfullscreen>
-</iframe>
+<video id="video" controls playsinline preload="metadata" style="width:min(900px,95vw);max-height:70vh;border-radius:15px;background:black"></video><p id="videoStatus" role="status"></p><p><a id="videoFallback" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" style="color:#aab4ff">Watch on YouTube</a></p>
 
 <br>
 
@@ -387,40 +382,23 @@ function legacyBuildWebsite() {
 }
 
 
-function startPrank() {
-
-  const video = document.getElementById("video");
-
-  document.getElementById("mainPage").style.display = "none";
-  document.getElementById("prankPage").style.display = "block";
-
-  video.src =
-    "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&playsinline=1";
-
-
-
+function startPrank(){
+ const video=document.getElementById("video"), status=document.getElementById("videoStatus");
+ document.getElementById("mainPage").style.display="none";
+ document.getElementById("prankPage").style.display="block";
+ status.textContent="";
+ video.muted=false;
+ video.defaultMuted=false;
+ video.src="./media.mp4";
+ video.play().catch(()=>{status.textContent="Tap Play to start. If the MP4 is unavailable, use the YouTube link.";});
 }
-
-
-function stopPrank() {
-
-  document.getElementById("video").src = "";
-
-  if (document.fullscreenElement) {
-    document.exitFullscreen().catch(() => {});
-  }
-
-  document.getElementById("prankPage").innerHTML = `
-    <h1>You just got rick rolled!</h1>
-    <button id="returnButton" type="button">Return to Adumbi</button>
-  `;
-
-  document.getElementById("returnButton").addEventListener("click", () => {
-    location.reload();
-  });
+document.getElementById("video").addEventListener("error",()=>{document.getElementById("videoStatus").textContent="The MP4 file is unavailable. Use the YouTube link or add media.mp4 to the repository.";});
+function stopPrank(){
+ const video=document.getElementById("video");
+ video.pause();video.removeAttribute("src");video.load();
+ document.getElementById("prankPage").style.display="none";
+ document.getElementById("mainPage").style.display="block";
 }
-
-
 /* Button events */
 document.getElementById("generateButton")
   .addEventListener("click", buildWebsite);
